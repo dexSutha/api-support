@@ -9,6 +9,9 @@ trait ResponseHelper
 
     public function makeJSONResponse($data, int $code)
     {
+        if($code === 4){
+            $data = array_merge($data, request()->all());
+        }
         return response()->json($data, $code);
         exit;
     }
