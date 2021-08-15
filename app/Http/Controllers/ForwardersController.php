@@ -9,7 +9,7 @@ class ForwardersController extends Controller {
     public function CandidateMessagingCount(Request $request)
     {
         try {
-            return (new StudentChatBoxController)->setReaded($request);
+            return (new StudentChatBoxController)->countChat($request);
         } catch (\Throwable $th) {
             throw $th;
         }
