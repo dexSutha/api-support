@@ -62,7 +62,7 @@ class WebinarNormalController extends Controller
             'webinar_id' => 'required|numeric|exists:' . $this->tbWebinar . ',id'
         ]);
         if ($validation->fails()) {
-            return $this->makeJSONResponse($validation->errors(), 400);
+            return $this->makeJSONResponse(['message' => $validation->errors()->first()], 400);
         } else {
             if ($webinar_id == null) {
                 return $this->makeJSONResponse(["message" => "webinar must not empty!"], 400);
@@ -230,7 +230,7 @@ class WebinarNormalController extends Controller
             'price'         => 'numeric',
         ]);
         if ($validation->fails()) {
-            return $this->makeJSONResponse($validation->errors(), 202);
+            return $this->makeJSONResponse(['message' => $validation->errors()->first()], 202);
         } else {
             $data = DB::transaction(function () use ($request) {
                 $duplicatename = DB::table($this->tbWebinar)
@@ -307,10 +307,28 @@ class WebinarNormalController extends Controller
             }
         }
     }
-    public function editWebinar(Request $request)
+    private function checkParam($param, $dbData)
+    {
+        $data = $param;
+        if ($data == null) {
+            $data = $dbData;
+        }
+
+        return $data;
+    }
+    public function editWebinar(Request $request, $webinar_id)
     {
         //validasi 
-        $validation = Validator::make($request->all(), [
+        $array_validation = array(
+            'webinar_id' => $webinar_id,
+            'event_name' => $request->event_name,
+            'event_date' => $request->event_date,
+            'event_link' => $request->event_link,
+            'event_start' => $request->event_start,
+            'event_end' => $request->event_end,
+            'event_picture' => $request->event_picture
+        );
+        $validation = Validator::make($array_validation, [
             'webinar_id'    => 'required|numeric|exists:' . $this->tbWebinar . ',id',
             'event_name'    => 'string',
             'event_date'    => 'date_format:Y-m-d',
@@ -321,56 +339,57 @@ class WebinarNormalController extends Controller
             'event_picture' => 'mimes:jpg,jpeg,png|max:2000'
         ]);
         if ($validation->fails()) {
-            return response()->json($validation->errors(), 202);
+            return response()->json(['message' => $validation->errors()->first()], 400);
         } else {
             //find webinar id
-            $webinar = DB::table($this->tbWebinar)
-                ->where('id', '=', $request->webinar_id)
-                ->select('id as webinar_id', 'event_picture as path', 'event_name', 'event_date', 'event_link', 'event_start', 'event_end', 'is_certificate', 'certificate')
-                ->get();
+            // $webinar = DB::table($this->tbWebinar)
+            //     ->where('id', '=', $webinar_id)
+            //     ->select('id as webinar_id', 'event_picture as path', 'event_name', 'event_date', 'event_link', 'event_start', 'event_end', 'is_certificate', 'certificate')
+            //     ->get();
+            $webinar = CareerSupportModelsWebinarBiasa::findOrFail($webinar_id);
             //set modified
             if (!empty($webinar)) {
-                $data = DB::transaction(function () use ($request, $webinar) {
-                    $path = $webinar[0]->path;
+                $data = DB::transaction(function () use ($request, $webinar, $webinar_id) {
+                    $path = $webinar->event_picture;
                     if ($file = $request->file('event_picture')) {
                         $path = $file->store('webinar_internal', 'public');
                     }
                     $datetime = Carbon::now();
                     $datetime->toDateTimeString();
                     $edited = array(
-                        'event_name' => $request->event_name,
-                        'event_date' => $request->event_date,
-                        'event_link' => $request->event_link,
-                        'event_start' => $request->event_start,
-                        'event_end' => $request->event_end,
-                        'price' => $request->price,
+                        'event_name' => $this->checkparam($request->event_name, $webinar->event_name),
+                        'event_date' => $this->checkparam($request->event_date, $webinar->event_date),
+                        'event_link' => $this->checkparam($request->event_link, $webinar->event_link),
+                        'event_start' => $this->checkparam($request->event_start, $webinar->event_start),
+                        'event_end' => $this->checkparam($request->event_end, $webinar->event_end),
+                        'price' => $this->checkparam($request->price, $webinar->price),
                         'modified' => $datetime,
                         'event_picture' => $path
                     );
                     DB::table($this->tbWebinar)
-                        ->where('id', '=', $request->webinar_id)
+                        ->where('id', '=', $webinar_id)
                         ->update($edited);
 
                     $tableUpdated = DB::table($this->tbWebinar)
-                        ->where('id', '=', $request->webinar_id)
+                        ->where('id', '=', $webinar_id)
                         ->select('*')
                         ->get();
                     $currency = "Rp " . number_format($request->price, 2, ',', '.');
                     $path_zip = null;
 
-                    if ($webinar[0]->is_certificate) {
-                        $path_zip = env("WEBINAR_URL") . $webinar[0]->certificate;
+                    if ($webinar->is_certificate) {
+                        $path_zip = env("WEBINAR_URL") . $webinar->certificate;
                     }
                     $response = array(
                         "id"            => $request->webinar_id,
                         "event_name"    => $request->event_name,
                         "event_date"    => $request->event_date,
                         "event_picture" => env("WEBINAR_URL") . $tableUpdated[0]->event_picture,
-                        "zoom_link"     => $request->zoom_link,
+                        "zoom_link"     => $request->event_link,
                         'event_start'   => $request->event_start,
                         'event_end'     => $request->event_end,
                         'price'         => $currency,
-                        "is_certificate"    => $webinar[0]->is_certificate,
+                        "is_certificate"    => $webinar->is_certificate,
                         "certificate"       => $path_zip,
                     );
                     return array(
@@ -395,7 +414,7 @@ class WebinarNormalController extends Controller
             'webinar_id' => 'required|numeric|exists:' . $this->tbWebinar . ',id'
         ]);
         if ($validation->fails()) {
-            return $this->makeJSONResponse($validation->errors(), 400);
+            return $this->makeJSONResponse(['message' => $validation->errors()->first()], 400);
         } else {
             $webinar = DB::table($this->tbWebinar)
                 ->where('id', '=', $webinar_id)
@@ -403,7 +422,7 @@ class WebinarNormalController extends Controller
             $delete = CareerSupportModelsWebinarBiasa::findOrfail($webinar_id);
             $name = str_replace(' ', '_', $webinar[0]->event_name);
             $path = 'certificate_internal/webinar_' . $name;
-            if (!empty($delete)) {
+            if ($delete) {
                 if (Storage::disk('public')->exists($delete->event_picture)) {
                     Storage::disk('public')->delete($delete->event_picture);
                     Storage::disk('public')->deleteDirectory($path);
