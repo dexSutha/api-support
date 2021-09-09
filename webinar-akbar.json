@@ -141,6 +141,36 @@
     },
     {
         "method": "GET",
+        "uri": "/api/v1/candidate/webinar-internal/detail/{webinar_id}",
+        "success_code": 200
+    },
+    {
+        "method": "POST",
+        "uri": "/api/v1/candidate/webinar-internal/register",
+        "success_code": 201
+    },
+    {
+        "method": "GET",
+        "uri": "/api/v1/candidate/webinar-internal/order/detail",
+        "success_code": 200
+    },
+    {
+        "method": "GET",
+        "uri": "/api/v1/candidate/webinar-internal/",
+        "success_code": 200
+    },
+    {
+        "method": "GET",
+        "uri": "/api/v1/candidate/webinar-internal/detail-list/student/{webinar_id}",
+        "success_code": 200
+    },
+    {
+        "method": "POST",
+        "uri": "/api/v1/candidate/webinar-internal/order/charge",
+        "success_code": 201
+    },
+    {
+        "method": "GET",
         "uri": "/api/v1/candidate/messaging/broadcast/detail",
         "success_code": 200
     },
@@ -182,6 +212,16 @@
     {
         "method": "GET",
         "uri": "/api/v1/candidate/messaging/readed",
+        "success_code": 200
+    },
+    {
+        "method": "PATCH",
+        "uri": "/api/v1/school/webinar-akbar/update-status/{webinarId}",
+        "success_code": 200
+    },
+    {
+        "method": "GET",
+        "uri": "/api/v1/school/webinar-akbar/detail/{webinar_id}",
         "success_code": 200
     },
     {
@@ -249,4 +289,5 @@
         "uri": "/api/v1/testing ",
         "success_code": 200
     }
+    
 ]
