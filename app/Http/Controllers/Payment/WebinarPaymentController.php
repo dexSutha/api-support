@@ -55,7 +55,7 @@ class WebinarPaymentController extends Controller
         ]);
 
         if ($validation->fails()) {
-            return response($validation->errors(), 400);
+            return response(["message" => $validation->errors()->first()], 400);
         } else {
             $status = DB::transaction(function () use ($request) {
                 //get the detail of order & webinar by order_id
