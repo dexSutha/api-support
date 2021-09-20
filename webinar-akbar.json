@@ -152,7 +152,7 @@
     {
         "method": "GET",
         "success_code": 200,
-        "uri": "/api/v1/candidate/webinar-internal/order/detail"
+        "uri": "/api/v1/candidate/webinar-internal/order/detail/{webinar_id}"
     },
     {
         "method": "GET",
