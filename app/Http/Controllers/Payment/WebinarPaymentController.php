@@ -11,6 +11,7 @@ use App\Models\CareerSupportModelsWebinarBiasa;
 use App\Models\NotificationWebinarModel;
 use App\Models\StudentModel;
 use App\Models\UserPersonal;
+use App\Traits\MicroBridge;
 use CareerSupportModelsOrders as GlobalCareerSupportModelsOrders;
 use Illuminate\Support\Facades\DB;
 use Veritrans_Config;
@@ -105,13 +106,15 @@ class WebinarPaymentController extends Controller
                     );
 
                     //send the tracsaction_details to midtrans and get the midtrans token
-                    $token = Veritrans_Snap::getSnapToken($params);
+                    
+                    $payment = MicroBridge::gateway()->payment->Create($params);
+                    // $token = Veritrans_Snap::getSnapToken($params);
 
                     //update the token, order_id, modified from order
                     DB::table($this->tbOrder)
                         ->where('id', $request->order_id)
                         ->update([
-                            'token' => $token,
+                            'token' => $payment->token,
                             'order_id' => $order_id,
                             'modified' => Carbon::now()
                         ]);
