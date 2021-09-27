@@ -40,6 +40,11 @@ class CertificateController extends Controller
     private $tbUserPersonal;
     use ResponseHelper;
 
+    public function test(Request $request)
+    {
+        dd(auth('api')->payload());
+    }
+
     public function __construct()
     {
         $this->tbStudent = StudentModel::tableName();
