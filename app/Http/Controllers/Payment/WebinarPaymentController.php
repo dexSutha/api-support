@@ -108,6 +108,7 @@ class WebinarPaymentController extends Controller
                     //send the tracsaction_details to midtrans and get the midtrans token
                     
                     $payment = MicroBridge::gateway()->payment->Create($params);
+                    $payment = json_decode($payment);
                     // $token = Veritrans_Snap::getSnapToken($params);
 
                     //update the token, order_id, modified from order
