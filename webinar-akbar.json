@@ -215,14 +215,19 @@
         "uri": "/api/v1/candidate/messaging/readed"
     },
     {
-        "method": "PATCH",
-        "success_code": 200,
-        "uri": "/api/v1/school/webinar-akbar/update-status/{webinarId}"
+        "method": "POST",
+        "uri": "/api/v1/school/webinar-akbar/update-status/{webinarId}",
+        "success_code": 200
     },
     {
         "method": "GET",
         "success_code": 200,
         "uri": "/api/v1/school/webinar-akbar/detail/{webinar_id}"
+    },
+    {
+        "method": "POST",
+        "uri": "/api/v1/school/webinar-akbar/send-invitation/{webinar_id}",
+        "success_code": 200
     },
     {
         "method": "GET",
