@@ -123,7 +123,7 @@ class WebinarPaymentController extends Controller
                     $token = $orderWebinar[0]->token;
                 }
 
-                return $token;
+                return $payment->token;
             });
 
             return $status ? $this->makeJSONResponse(['token' => $status], 201) : $this->makeJSONResponse(['message' => 'failed'], 400);
