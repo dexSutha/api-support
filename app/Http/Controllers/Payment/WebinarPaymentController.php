@@ -59,7 +59,7 @@ class WebinarPaymentController extends Controller
             return response(["message" => $validation->errors()->first()], 400);
         } else {
             $status = DB::transaction(function () use ($request) {
-                //get the detail of order & webinar by order_id
+                //get the detail of order & webinar by order id
                 $orderWebinar = DB::table($this->tbOrder, 'order')
                     ->leftJoin($this->tbWebinar . ' as webinar', 'order.webinar_id', '=', 'webinar.id')
                     ->leftJoin($this->tbParticipant . ' as participant', 'participant.id', '=', 'order.participant_id')
@@ -122,10 +122,14 @@ class WebinarPaymentController extends Controller
                     $token = $orderWebinar[0]->token;
                 }
 
-                return $token;
+                return (object) array(
+                    'order_id'      => $request->order_id,
+                    'token'         => $token,
+                    'redirect_url'  => env('PAYMENT_URL') . $token
+                );
             });
 
-            return $status ? $this->makeJSONResponse(['token' => $status], 201) : $this->makeJSONResponse(['message' => 'failed'], 400);
+            return $status ? $this->makeJSONResponse($status, 201) : $this->makeJSONResponse(['message' => 'failed'], 400);
         }
     }
 
