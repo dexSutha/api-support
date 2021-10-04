@@ -107,15 +107,14 @@ class WebinarPaymentController extends Controller
 
                     //send the tracsaction_details to midtrans and get the midtrans token
                     
-                    $payment = MicroBridge::gateway()->payment->Create($params);
-                    $payment = json_decode($payment);
+                    $token = MicroBridge::gateway()->payment->Create($params);
                     // $token = Veritrans_Snap::getSnapToken($params);
 
                     //update the token, order_id, modified from order
                     DB::table($this->tbOrder)
                         ->where('id', $request->order_id)
                         ->update([
-                            'token' => $payment->token,
+                            'token' => $token,
                             'order_id' => $order_id,
                             'modified' => Carbon::now()
                         ]);
@@ -123,7 +122,7 @@ class WebinarPaymentController extends Controller
                     $token = $orderWebinar[0]->token;
                 }
 
-                return $payment->token;
+                return $token;
             });
 
             return $status ? $this->makeJSONResponse(['token' => $status], 201) : $this->makeJSONResponse(['message' => 'failed'], 400);

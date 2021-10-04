@@ -28,6 +28,6 @@ class PaymentGateway {
     */
     public function Create($params)
     {
-        return $this->bridge->Send(HTTPMethod::POST, "payment/new", $params);
+        return json_decode($this->bridge->Send(HTTPMethod::POST, "payment/new", $params))->token;
     }
 }
