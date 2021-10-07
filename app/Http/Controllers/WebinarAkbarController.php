@@ -213,6 +213,7 @@ class WebinarAkbarController extends Controller
                         $batch = DB::connection('pgsql2')
                             ->table($this->tbUserEdu)
                             ->where('school_id', '=', $request->school_id)
+                            ->where('start_year', '!=', null)
                             ->select('start_year')
                             ->get();
 
@@ -220,10 +221,13 @@ class WebinarAkbarController extends Controller
                         for ($i = 0; $i < count($batch); $i++) {
                             $year = DB::connection('pgsql2')
                                 ->table($this->tbUserEdu)
+                                ->where('start_year', '!=', null)
                                 ->where('school_id', '=', $request->school_id)
+                                ->orderBy('start_year', 'asc')
                                 ->select('start_year')
                                 ->get();
                             $angkatan[$i] = $year[$i]->start_year;
+                            // var_dump($angkatan);
                         }
                         $startYear = array_unique($angkatan, SORT_REGULAR);
 
@@ -255,7 +259,13 @@ class WebinarAkbarController extends Controller
                         foreach ($startYear as $year) {
                             $angkatan[$idTemp] = array(
                                 "year"  => $year,
-                                "total" => count(DB::connection('pgsql2')->table($this->tbUserEdu)->where('school_id', '=', $request->school_id)->where("start_year", '=', $year)->get())
+                                "total" => count(DB::connection('pgsql2')
+                                    ->table($this->tbUserEdu)
+                                    ->where('school_id', '=', $request->school_id)
+                                    ->where("start_year", '=', $year)
+                                    ->where('verified', '=', true)
+                                    ->where('start_year', '!=', null)
+                                    ->get())
                             );
                             $angkatanArr[$idTemp] = $angkatan[$idTemp];
                             $idTemp++;
