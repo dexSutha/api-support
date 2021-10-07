@@ -80,9 +80,9 @@
         "uri": "/api/v1/administrator/webinar-internal/create"
     },
     {
-        "method": "DELET",
-        "success_code": 200,
-        "uri": "/api/v1/administrator/webinar-internal/delete/{webinar_id}"
+        "method": "DELETE",
+        "uri": "/api/v1/administrator/webinar-internal/delete/{webinar_id}",
+        "success_code": 200
     },
     {
         "method": "GET",
