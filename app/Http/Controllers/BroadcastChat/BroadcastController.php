@@ -118,7 +118,7 @@ class BroadcastController extends Controller
                         'description'       => "You got a new announcement from school",
                         'datetime'          => $request->send_time,
                         'is_seen'           => false,
-                        'type'              => 5,
+                        'type'              => 6,
                         'type_profile'      => 1,
                         'type_education'    => 1,
                         'user_id'           => $student->user_id,
